@@ -1,0 +1,40 @@
+# syntax=docker/dockerfile:1
+
+ARG PYTHON_VERSION=3.12
+
+FROM python:${PYTHON_VERSION}-slim as builder
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+RUN python -m pip install --no-cache-dir -r requirements.txt
+
+
+FROM python:${PYTHON_VERSION}-slim
+
+WORKDIR /app
+
+# Keeps Python from generating .pyc files in the container
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Turns off buffering for easier container logging
+ENV PYTHONUNBUFFERED=1
+
+# Copy installed dependencies from builder stage
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# Copy the rest of your application
+COPY . /app
+
+# Install debugpy
+RUN pip install debugpy
+
+# Disable file validation for debugpy
+ENV PYDEVD_DISABLE_FILE_VALIDATION=1
+
+EXPOSE 5678
+
+# During debugging, this entry point will be overridden.
+CMD ["python3", "-m", "debugpy", "--listen", "0.0.0.0:5678", "-m", "uvicorn", "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]

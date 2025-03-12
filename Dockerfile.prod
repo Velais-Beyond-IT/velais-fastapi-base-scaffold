@@ -1,0 +1,50 @@
+# syntax=docker/dockerfile:1
+
+# Build stage
+ARG PYTHON_VERSION=3.12
+FROM python:${PYTHON_VERSION}-slim as builder
+
+# Set working directory
+WORKDIR /app
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN python -m pip install -r requirements.txt
+
+# Runtime stage
+FROM python:${PYTHON_VERSION}-slim as runtime
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PATH=/root/.local/bin:$PATH
+
+# Create non-root user
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+# Set working directory
+WORKDIR /app
+
+# Copy only the dependencies from builder stage
+COPY --from=builder /root/.local /root/.local
+
+# Copy application code
+COPY . .
+
+# Change ownership and permissions
+RUN chown -R appuser:appuser /app && \
+    chmod -R 755 /app
+
+# Switch to non-root user
+USER appuser
+
+# Expose port
+EXPOSE 8000
+
+# Run application
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

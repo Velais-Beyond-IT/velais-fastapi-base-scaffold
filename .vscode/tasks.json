@@ -1,0 +1,25 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "docker-build",
+      "label": "docker-build",
+      "platform": "python",
+      "dockerBuild": {
+        "tag": "vefastapi:latest", // Replace <vefastapi> with the name of your image
+        "dockerfile": "${workspaceFolder}/Dockerfile.debug",
+        "context": "${workspaceFolder}",
+        "pull": true
+      }
+    },
+    {
+      "type": "docker-run",
+      "label": "docker-run: debug",
+      "dependsOn": ["docker-build"],
+      "python": {
+        "args": ["app.main:app", "--host", "0.0.0.0", "--port", "5678"],
+        "module": "uvicorn"
+      }
+    }
+  ]
+}
