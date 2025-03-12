@@ -12,6 +12,7 @@ This repository provides a scaffold FastAPI project with Docker support and pre-
 - 📝 Comprehensive logging setup
 - 🔒 CORS middleware configured
 - 📚 Swagger UI (available only in development environment)
+- ✅ Unit tests with pytest
 
 ## Prerequisites
 
@@ -72,6 +73,16 @@ docker run -p 8000:8000 -p 5678:5678 vedocker-debug-python:dev
 3. Press F5 or use the Run and Debug panel to start debugging
 4. The debugger will attach to the running container
 
+## Running Tests
+
+To run the tests, use the following command:
+
+```bash
+pytest
+```
+
+This will execute all the tests in the `tests` directory and provide a summary of the results.
+
 ## API Documentation
 
 ### Swagger UI
@@ -116,6 +127,10 @@ Note: Swagger UI is intentionally disabled in production mode for security reaso
 │   ├── __init__.py
 │   └── main.py              # Application entry point
 │
+├── tests/                   # Test cases
+│   ├── test_health_check.py # Health check endpoint tests
+│   └── test_rate_limit_exceeded.py # Rate limit exceeded tests
+│
 ├── .vscode/                 # VS Code configuration
 │   ├── launch.json         # Debug configuration
 │   ├── settings.json      # Editor settings
@@ -149,6 +164,11 @@ Note: Swagger UI is intentionally disabled in production mode for security reaso
 - **routers/**: API route definitions
 
   - `health_check.py`: Health check endpoint implementation
+
+- **tests/**: Test cases for the application
+
+  - `test_health_check.py`: Tests for the health check endpoint
+  - `test_rate_limit_exceeded.py`: Tests for rate limit exceeded scenarios
 
 - **Docker Files**:
   - `Dockerfile`: Basic production container
