@@ -49,7 +49,7 @@ pip install -r requirements.txt
 4. Create a `.env` file in the project root:
 
 ```env
-env=Development
+env=development
 rate_limiter="5/minute"
 ```
 
@@ -87,7 +87,7 @@ This will execute all the tests in the `tests` directory and provide a summary o
 
 ### Swagger UI
 
-When running in development mode (`env=Development`), the Swagger UI documentation is available at:
+When running in development mode (`env=development`), the Swagger UI documentation is available at:
 
 - http://localhost:8000/docs
 
@@ -129,7 +129,6 @@ Note: Swagger UI is intentionally disabled in production mode for security reaso
 │
 ├── tests/                   # Test cases
 │   ├── test_health_check.py # Health check endpoint tests
-│   └── test_rate_limit_exceeded.py # Rate limit exceeded tests
 │
 ├── .vscode/                 # VS Code configuration
 │   ├── launch.json         # Debug configuration
@@ -168,7 +167,6 @@ Note: Swagger UI is intentionally disabled in production mode for security reaso
 - **tests/**: Test cases for the application
 
   - `test_health_check.py`: Tests for the health check endpoint
-  - `test_rate_limit_exceeded.py`: Tests for rate limit exceeded scenarios
 
 - **Docker Files**:
   - `Dockerfile`: Basic production container
