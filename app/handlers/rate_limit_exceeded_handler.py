@@ -8,7 +8,7 @@ from app.models.responses.rate_limit_exceeded_response import RateLimitExceededR
 logger = logging.getLogger(__name__)
 
 
-def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> Response:
+def rate_limit_exceeded_handler(request: Request, exc: Exception) -> Response:
     """
     Custom handler for managing requests that exceed rate limits.
 
@@ -24,21 +24,27 @@ def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> Res
         Response: A JSON response with status code 429, a Retry-After header,
                   and a detailed message in the body.
     """
+    if isinstance(exc, RateLimitExceeded):
+        client_host = request.client.host if request.client is not None else "unknown"
+        logger.info("Rate limiter triggered by %s", client_host)
 
-    logger.info(f"Rate limiter triggered by {request.client.host}")
+        retry_after_seconds = getattr(
+            getattr(getattr(exc, "limit", None), "GRANULARITY", None), "seconds", 1
+        )
 
-    retry_after_seconds = exc.limit.limit.GRANULARITY.seconds
+        response_body = RateLimitExceededResponse(retry_after_seconds=retry_after_seconds)
 
-    response_body = RateLimitExceededResponse(retry_after_seconds=retry_after_seconds)
+        response = JSONResponse(
+            status_code=429,
+            content=response_body.model_dump(),
+            headers={"Retry-After": str(retry_after_seconds)},
+        )
 
-    response = JSONResponse(
-        status_code=429,
-        content=response_body.model_dump(),
-        headers={"Retry-After": str(retry_after_seconds)},
-    )
+        if hasattr(request.app.state.limiter, "inject_headers"):
+            response = request.app.state.limiter.inject_headers(
+                response, request.state.view_rate_limit
+            )
 
-    response = request.app.state.limiter._inject_headers(
-        response, request.state.view_rate_limit
-    )
-
-    return response
+        return response
+    else:
+        raise exc
