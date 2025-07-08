@@ -21,10 +21,14 @@ repos:
       - id: check-added-large-files
         description: Prevent large files from being committed
         args: ['--maxkb=1000']
+      - id: check-case-conflict
+        description: Check for files that would conflict on case-insensitive filesystems
       - id: check-merge-conflict
         description: Check for merge conflict markers
       - id: debug-statements
         description: Check for debugger imports and py37+ breakpoint() calls
+      - id: forbid-new-submodules
+        description: Prevent addition of new git submodules
 
   # Python code formatting with ruff
   - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -35,6 +39,27 @@ repos:
         args: [--fix]
       - id: ruff-format
         description: Run Ruff formatter
+
+  # Check for OS-specific files
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-case-conflict
+        description: Check for files that would conflict on case-insensitive filesystems
+      - id: mixed-line-ending
+        description: Replaces or checks mixed line endings
+
+  # Custom hook to prevent OS files
+  - repo: local
+    hooks:
+      - id: check-os-files
+        name: Check for OS-specific files
+        entry: bash
+        args: ['-c', 'if find . -name ".DS_Store" -o -name "Thumbs.db" -o -name "desktop.ini" | grep -q .; then echo "❌ OS-specific files found! Please remove them."; exit 1; fi']
+        language: system
+        always_run: true
+        pass_filenames: false
+        description: Prevent OS-specific files from being committed
 
   # MyPy type checking
   - repo: local
