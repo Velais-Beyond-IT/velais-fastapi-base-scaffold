@@ -1,0 +1,82 @@
+# Pre-commit configuration for FastAPI project
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+
+repos:
+  # Built-in pre-commit hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        description: Trim trailing whitespace
+      - id: end-of-file-fixer
+        description: Ensure files end with a newline
+      - id: check-yaml
+        description: Check YAML syntax
+      - id: check-toml
+        description: Check TOML syntax
+      - id: check-json
+        description: Check JSON syntax
+        exclude: ^\.vscode/
+      - id: check-added-large-files
+        description: Prevent large files from being committed
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+        description: Check for merge conflict markers
+      - id: debug-statements
+        description: Check for debugger imports and py37+ breakpoint() calls
+
+  # Python code formatting with ruff
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.2
+    hooks:
+      - id: ruff
+        description: Run Ruff linter
+        args: [--fix]
+      - id: ruff-format
+        description: Run Ruff formatter
+
+  # MyPy type checking
+  - repo: local
+    hooks:
+      - id: mypy
+        name: MyPy Type Checking
+        entry: uv run mypy
+        language: system
+        types: [python]
+        files: ^app/
+        description: Run mypy static type checker
+        require_serial: false
+
+  # Run tests
+  - repo: local
+    hooks:
+      - id: pytest
+        name: Run Tests
+        entry: uv run pytest
+        language: system
+        types: [python]
+        pass_filenames: false
+        description: Run the test suite
+        require_serial: true
+
+  # Security checks with bandit
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.0
+    hooks:
+      - id: bandit
+        description: Find common security issues
+        args: ['-c', 'pyproject.toml']
+        additional_dependencies: ['bandit[toml]']
+
+  # Dockerfile linting
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        description: Lint Dockerfiles
+        files: ^Dockerfile.*
+
+# Configuration for specific hooks
+default_language_version:
+  python: python3.13

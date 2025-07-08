@@ -13,3 +13,102 @@ dependencies = [
     "slowapi==0.1.9",
     "uvicorn==0.34.0",
 ]
+
+[dependency-groups]
+dev = [
+    "bandit>=1.8.6",
+    "mypy>=1.16.1",
+    "pre-commit>=4.2.0",
+    "ruff>=0.12.2",
+    "types-requests>=2.32.4.20250611",
+]
+
+[tool.mypy]
+# Basic mypy configuration for FastAPI/Pydantic v2
+python_version = "3.13"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+strict_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+
+# Pydantic v2 plugin for better type checking
+plugins = ["pydantic.mypy"]
+
+# Output configuration
+show_error_codes = true
+show_column_numbers = true
+pretty = true
+
+# Exclude patterns
+exclude = [
+    "__pycache__",
+    ".venv",
+    "build",
+    "dist",
+]
+
+[tool.pydantic-mypy]
+# Pydantic-specific mypy settings
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+warn_untyped_fields = true
+
+# Per-module configuration
+[[tool.mypy.overrides]]
+module = [
+    "slowapi.*",
+    "uvicorn.*",
+]
+ignore_missing_imports = true
+
+# Test files can be less strict
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+[tool.ruff]
+# Ruff configuration for linting and formatting
+target-version = "py313"
+line-length = 88
+fix = true
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "UP",   # pyupgrade
+    "ARG",  # flake8-unused-arguments
+    "SIM",  # flake8-simplify
+]
+ignore = [
+    "E501",  # line too long, handled by formatter
+    "B008",  # do not perform function calls in argument defaults
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*" = ["ARG", "SIM"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.bandit]
+# Bandit security linting configuration
+exclude_dirs = ["tests", ".venv"]
+skips = ["B101"]  # Skip assert_used test
+
+[tool.bandit.assert_used]
+skips = ["**/test_*.py", "**/tests.py"]

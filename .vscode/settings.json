@@ -29,5 +29,10 @@
   // ===========================
   // 🔤 Spell Checker
   // ===========================
-  "cSpell.words": ["pytest"]
+  "cSpell.words": [
+    "appuser",
+    "MYPY",
+    "pyproject",
+    "pytest"
+  ]
 }

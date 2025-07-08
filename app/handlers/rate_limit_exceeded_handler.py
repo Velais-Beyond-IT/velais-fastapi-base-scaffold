@@ -1,9 +1,10 @@
 import logging
-from fastapi import Request, Response
-from starlette.responses import JSONResponse
-from slowapi.errors import RateLimitExceeded
 
-from app.models.responses.rate_limit_exceeded_response import RateLimitExceededResponse
+from fastapi import Request, Response
+from slowapi.errors import RateLimitExceeded
+from starlette.responses import JSONResponse
+
+from app.schemas.rate_limit_exceeded_response import RateLimitExceededResponse
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +33,9 @@ def rate_limit_exceeded_handler(request: Request, exc: Exception) -> Response:
             getattr(getattr(exc, "limit", None), "GRANULARITY", None), "seconds", 1
         )
 
-        response_body = RateLimitExceededResponse(retry_after_seconds=retry_after_seconds)
+        response_body = RateLimitExceededResponse(
+            retry_after_seconds=retry_after_seconds
+        )
 
         response = JSONResponse(
             status_code=429,

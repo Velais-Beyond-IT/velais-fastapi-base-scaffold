@@ -6,7 +6,7 @@
       "label": "docker-build",
       "platform": "python",
       "dockerBuild": {
-        "tag": "vefastapi:latest", // Replace <vefastapi> with the name of your image
+        "tag": "velaisfastapiscaffold:latest", // Replace <velaisfastapiscaffold> with the name of your image
         "dockerfile": "${workspaceFolder}/Dockerfile.debug",
         "context": "${workspaceFolder}",
         "pull": true
@@ -19,6 +19,61 @@
       "python": {
         "args": ["app.main:app", "--host", "0.0.0.0", "--port", "5678"],
         "module": "uvicorn"
+      }
+    },
+    {
+      "type": "shell",
+      "label": "mypy: Type Check",
+      "command": "uv",
+      "args": ["run", "mypy", "app/"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": {
+        "owner": "mypy",
+        "fileLocation": "absolute",
+        "pattern": [
+          {
+            "regexp": "^(.+):(\\d+):(\\d+):\\s+(error|warning|note):\\s+(.+)\\s+\\[(.+)\\]$",
+            "file": 1,
+            "line": 2,
+            "column": 3,
+            "severity": 4,
+            "message": 5,
+            "code": 6
+          }
+        ]
+      }
+    },
+    {
+      "type": "shell",
+      "label": "pre-commit: Run All Checks",
+      "command": "uv",
+      "args": ["run", "pre-commit", "run", "--all-files"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": {
+        "owner": "pre-commit",
+        "fileLocation": "absolute",
+        "pattern": [
+          {
+            "regexp": "^(.+):(\\d+):(\\d+):\\s+(error|warning|note):\\s+(.+)$",
+            "file": 1,
+            "line": 2,
+            "column": 3,
+            "severity": 4,
+            "message": 5
+          }
+        ]
       }
     }
   ]

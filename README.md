@@ -1,207 +1,429 @@
-# veFastAPI Scaffold
+# Velais FastAPI Scaffold
 
-This repository provides a scaffold FastAPI project with Docker support and pre-configured debugging capabilities using VS Code. It includes rate limiting by default using slowapi and configuration management with pydantic-settings.
+A production-ready FastAPI project scaffold with modern Python development tools, Docker support, and comprehensive type checking. This scaffold follows Python best practices and includes everything needed to build robust, scalable APIs.
 
-## Features
+## ✨ Features
 
-- 🐳 Docker support with separate development and production configurations
-- 🐞 Pre-configured debugging setup with debugpy
-- 🚦 Built-in rate limiting with slowapi
-- ⚙️ Environment-based configuration using pydantic-settings
-- 🔍 Health check endpoint
-- 📝 Comprehensive logging setup
-- 🔒 CORS middleware configured
-- 📚 Swagger UI (available only in development environment)
-- ✅ Unit tests with pytest
+- 🚀 **FastAPI**: Modern, fast web framework with automatic API documentation
+- 🐳 **Docker**: Multi-stage builds for development, staging, and production
+- 🔧 **uv**: Ultra-fast Python package installer and resolver
+- � **MyPy**: Static type checking with Pydantic v2 integration
+- 🚦 **Rate Limiting**: Built-in API rate limiting with slowapi
+- ⚙️ **Configuration**: Environment-based config with pydantic-settings
+- 🧪 **Testing**: Comprehensive test suite with pytest
+- 📝 **Documentation**: Auto-generated API docs with Swagger UI
+- 🔒 **Security**: CORS middleware and production-ready configurations
+- � **Debugging**: VS Code debugging support with Docker
+- 📊 **Code Quality**: Pre-configured linting and formatting tools
 
-## Prerequisites
+## 🛠 Prerequisites
 
-- Python 3.12+
-- Docker
-- Visual Studio Code
-- VS Code Python extension
-- VS Code Docker extension
+- **Python 3.13+** (specified in pyproject.toml)
+- **uv** - [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
+- **Docker** (optional, for containerized development)
+- **Visual Studio Code** (recommended) with Python extension
 
-## Getting Started
+## 🚀 Quick Start
 
-1. Clone the repository:
-
-```bash
-git clone https://github.com/velais/veDocker-debug-python.git
-cd veDocker-debug-python
-```
-
-2. Create and activate a virtual environment:
+### 1. Clone and Setup
 
 ```bash
-python -m venv .venv
+git clone <your-repo-url>
+cd velais-fastapi-scaffold
+
+# Install dependencies with uv
+uv sync
+
+# Activate the virtual environment
 source .venv/bin/activate  # Linux/MacOS
 # or
-.venv\Scripts\activate  # Windows
+.venv\Scripts\activate     # Windows
 ```
 
-3. Install dependencies:
+### 2. Environment Configuration
 
-```bash
-pip install -r requirements.txt
-```
-
-4. Create a `.env` file in the project root:
+Create a `.env` file in the project root:
 
 ```env
 env=development
-rate_limiter="5/minute"
+rate_limiter=5/minute
 ```
 
-## Development with Docker
-
-### Running the Application
-
-1. Build and run the development container:
+### 3. Run the Application
 
 ```bash
-docker build -f Dockerfile.debug -t vedocker-debug-python:dev .
-docker run -p 8000:8000 -p 5678:5678 vedocker-debug-python:dev
+# Using uv (recommended)
+uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# Or with activated environment
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-2. The API will be available at: `http://localhost:8000`
+The API will be available at:
+- **Application**: http://localhost:8000
+- **API Documentation**: http://localhost:8000/docs (development only)
+- **Health Check**: http://localhost:8000/api/v1/health
 
-### Debugging with VS Code
+## 🧪 Development Workflow
 
-1. Open the project in VS Code
+### Type Checking with MyPy
+
+```bash
+# Run type checking
+uv run mypy app/
+
+# Using the convenience script
+./scripts/type_check.sh
+
+# VS Code: Ctrl/Cmd+Shift+P → "Tasks: Run Task" → "mypy: Type Check"
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+uv run pytest
+
+# Run with coverage
+uv run pytest --cov=app
+
+# Run specific test file
+uv run pytest tests/test_health_check.py -v
+```
+
+### Code Quality Tools
+
+```bash
+# Type checking
+uv run mypy app/
+
+# Linting and formatting
+uv run ruff check app/
+uv run ruff format app/
+
+# Security scanning
+uv run bandit -r app/
+
+# Run tests
+uv run pytest
+
+# Pre-commit checks (all tools)
+uv run pre-commit run --all-files
+
+# Using convenience script
+./scripts/pre_commit_check.sh all
+```
+
+### Pre-commit Hooks
+
+This project uses pre-commit hooks to ensure code quality before commits:
+
+**Automatic checks on every commit:**
+- ✅ **Code formatting** with Ruff
+- ✅ **Type checking** with MyPy
+- ✅ **Security scanning** with Bandit
+- ✅ **Test execution** with pytest
+- ✅ **File formatting** (trailing whitespace, end-of-file)
+- ✅ **Docker linting** with Hadolint
+
+**Setup (already done):**
+```bash
+uv run pre-commit install
+```
+
+**Manual execution:**
+```bash
+# Run on all files
+uv run pre-commit run --all-files
+
+# Run on staged files only
+uv run pre-commit run
+
+# Using convenience script
+./scripts/pre_commit_check.sh
+```
+
+## 🐳 Docker Development
+
+### Development Container
+
+```bash
+# Build development image
+docker build -f Dockerfile.debug -t velais-fastapi:dev .
+
+# Run with debugging support
+docker run -p 8000:8000 -p 5678:5678 velais-fastapi:dev
+```
+
+### VS Code Debugging
+
+1. Open project in VS Code
 2. Set breakpoints in your code
-3. Press F5 or use the Run and Debug panel to start debugging
+3. Press F5 or use the Run and Debug panel
 4. The debugger will attach to the running container
 
-## Running Tests
-
-To run the tests, use the following command:
+### Production Containers
 
 ```bash
-pytest
+# Staging build
+docker build -f Dockerfile.stg -t velais-fastapi:staging .
+docker run -p 8000:8000 velais-fastapi:staging
+
+# Production build
+docker build -f Dockerfile.prod -t velais-fastapi:prod .
+docker run -p 8000:8000 velais-fastapi:prod
 ```
 
-This will execute all the tests in the `tests` directory and provide a summary of the results.
+### Docker Features
 
-## API Documentation
+- **🚀 uv Integration**: Ultra-fast dependency resolution and installation
+- **📦 Multi-stage Builds**: Optimized for production with smaller final images
+- **🔒 Security**: Non-root user and minimal attack surface
+- **🏥 Health Checks**: Built-in health monitoring for production
+- **🐛 Debug Support**: Remote debugging with debugpy integration
 
-### Swagger UI
-
-When running in development mode (`env=development`), the Swagger UI documentation is available at:
-
-- http://localhost:8000/docs
-
-The Swagger UI provides:
-
-- Interactive API documentation
-- Request/response examples
-- Try-out functionality for all endpoints
-- API schema visualization
-
-Note: Swagger UI is intentionally disabled in production mode for security reasons.
-
-## Detailed Project Structure
+## 📁 Project Structure
 
 ```
-├── app/
-│   ├── configuration/           # Application configuration
-│   │   ├── __init__.py
-│   │   ├── settings.py         # Environment and app settings
-│   │   └── limiter.py          # Rate limiting configuration
+├── app/                           # Main application package
+│   ├── __init__.py               # Package initialization with docstring
+│   ├── main.py                   # FastAPI application entry point
 │   │
-│   ├── handlers/               # Custom exception handlers
+│   ├── config/                   # Configuration management
+│   │   ├── __init__.py
+│   │   ├── settings.py          # Pydantic settings with env vars
+│   │   └── limiter.py           # Rate limiting configuration
+│   │
+│   ├── database/                # Database models and connections
+│   │   └── __init__.py          # Database package (ready for models)
+│   │
+│   ├── handlers/                # Custom exception handlers
 │   │   ├── __init__.py
 │   │   └── rate_limit_exceeded_handler.py
 │   │
-│   ├── models/                # Data models
-│   │   ├── __init__.py
-│   │   └── responses/        # Response models
-│   │       ├── __init__.py
-│   │       ├── health_response.py
-│   │       └── rate_limit_exceeded_response.py
+│   ├── models/                  # Data models (for database entities)
+│   │   └── __init__.py
 │   │
-│   ├── routers/              # API route definitions
+│   ├── routers/                 # API route definitions
 │   │   ├── __init__.py
-│   │   └── health_check.py
+│   │   └── health_check.py      # Health check endpoint
 │   │
-│   ├── __init__.py
-│   └── main.py              # Application entry point
+│   └── schemas/                 # Pydantic models for API
+│       ├── __init__.py          # Schemas package with docstring
+│       ├── health_response.py   # Health check response schema
+│       └── rate_limit_exceeded_response.py
 │
-├── tests/                   # Test cases
-│   ├── test_health_check.py # Health check endpoint tests
+├── tests/                       # Test suite
+│   └── test_health_check.py    # Health endpoint tests
 │
-├── .vscode/                 # VS Code configuration
-│   ├── launch.json         # Debug configuration
-│   ├── settings.json      # Editor settings
-│   └── tasks.json        # Build/run tasks
+├── scripts/                     # Development scripts
+│   └── type_check.sh           # Type checking convenience script
 │
-├── Dockerfile            # Production container configuration
-├── Dockerfile.debug     # Development container with debugging
-├── Dockerfile.prod     # Production-optimized container
-├── requirements.txt   # Python dependencies
-├── .env              # Environment variables (create this)
-├── .gitignore       # Git ignore rules
-├── LICENSE         # MIT License
-└── README.md      # Project documentation
+├── docs/                        # Documentation
+│   └── MYPY_GUIDE.md           # MyPy usage guide
+│
+├── .vscode/                     # VS Code configuration
+│   ├── launch.json             # Debug configuration
+│   ├── settings.json           # Editor settings
+│   └── tasks.json              # Build/run tasks
+│
+├── Dockerfile.debug             # Development container with debugging
+├── Dockerfile.stg              # Staging container
+├── Dockerfile.prod             # Production-optimized container
+├── pyproject.toml              # Project configuration with mypy settings
+├── uv.lock                     # Dependency lock file
+├── .env                        # Environment variables (create this)
+└── README.md                   # This documentation
 ```
 
-### Key Components
+## ⚙️ Configuration Management
 
-- **configuration/**: Contains all configuration-related code
+### Environment Variables
 
-  - `settings.py`: Manages environment variables and app settings using pydantic-settings
-  - `limiter.py`: Configures the rate limiting behavior
+Configure your application through environment variables in `.env`:
 
-- **handlers/**: Custom exception handlers
+```env
+# Application environment
+env=development              # development, staging, production
 
-  - `rate_limit_exceeded_handler.py`: Handles rate limit exceeded scenarios
+# Rate limiting
+rate_limiter=5/minute       # Format: number/timeunit (second, minute, hour, day)
 
-- **models/**: Data models and schemas
+# Add your custom settings here
+# DATABASE_URL=postgresql://...
+# REDIS_URL=redis://...
+```
 
-  - `responses/`: Response models for API endpoints
+### Settings Class
 
-- **routers/**: API route definitions
-
-  - `health_check.py`: Health check endpoint implementation
-
-- **tests/**: Test cases for the application
-
-  - `test_health_check.py`: Tests for the health check endpoint
-
-- **Docker Files**:
-  - `Dockerfile`: Basic production container
-  - `Dockerfile.debug`: Development container with debugging support
-  - `Dockerfile.prod`: Optimized production container with security enhancements
-
-## Rate Limiting
-
-The application includes rate limiting by default using slowapi. To exempt a route from rate limiting, use the `@limiter.exempt` decorator:
+The `app.config.settings.Settings` class manages all configuration:
 
 ```python
-from app.configuration.limiter import limiter
+from app.config.settings import settings
 
-@router.get("/my-endpoint")
-@limiter.exempt
-async def my_endpoint():
-    return {"message": "This endpoint is not rate limited"}
+# Access settings anywhere in your app
+print(f"Environment: {settings.env}")
+print(f"Rate limit: {settings.rate_limiter}")
 ```
 
-## Configuration
+## 🔍 Type Checking
 
-Application settings are managed through environment variables and the `.env` file using pydantic-settings. Configure the following variables:
+This project uses MyPy for static type checking with the following configuration:
 
-- `env`: Application environment (e.g., development or production)
-- `rate_limiter`: Rate limiting rule (e.g., "5/minute")
+### MyPy Configuration Features:
+- **Strict mode** enabled for maximum type safety
+- **Pydantic v2 plugin** for better model validation
+- **Custom overrides** for third-party libraries
+- **Error codes** displayed for easy troubleshooting
 
-## Production Deployment
+### Best Practices:
+- All functions have type annotations
+- Pydantic models use `Field()` with descriptions
+- Return types are explicitly declared
+- Optional types are properly handled
 
-For production deployment, use the production Dockerfile:
+See `docs/MYPY_GUIDE.md` for detailed type checking guidelines.
 
+## 🚦 Rate Limiting
+
+Built-in rate limiting using slowapi:
+
+### Configuration:
+```python
+# In .env file
+rate_limiter=10/minute
+```
+
+### Exempting Endpoints:
+```python
+from app.config.limiter import limiter
+
+@router.get("/unlimited")
+@limiter.exempt  # type: ignore[misc]
+async def unlimited_endpoint():
+    return {"message": "No rate limit applied"}
+```
+
+## 🧪 Testing
+
+### Test Structure:
+- Unit tests for all endpoints
+- Integration tests for database operations (when added)
+- Proper test fixtures and mocking
+
+### Running Tests:
 ```bash
-docker build -f Dockerfile.prod -t vedocker-debug-python:prod .
-docker run -p 8000:8000 vedocker-debug-python:prod
+# Run all tests
+uv run pytest
+
+# With verbose output
+uv run pytest -v
+
+# With coverage report
+uv run pytest --cov=app --cov-report=html
 ```
 
-## License
+## 🚀 Production Deployment
+
+### Environment Setup:
+1. Set `env=production` in your environment
+2. Configure production database URLs
+3. Set up proper secrets management
+4. Use production Dockerfile
+
+### Docker Production:
+```bash
+# Build production image
+docker build -f Dockerfile.prod -t velais-fastapi:prod .
+
+# Run production container
+docker run -p 8000:8000 \
+  -e env=production \
+  -e rate_limiter=100/minute \
+  velais-fastapi:prod
+```
+
+### Security Features:
+- Swagger UI disabled in production
+- CORS properly configured
+- Rate limiting enabled by default
+- Environment-based configuration
+
+## 🛠 Development Tools
+
+### VS Code Integration:
+- **Tasks**: Pre-configured build and test tasks
+- **Debugging**: Full Docker debugging support
+- **Problem Matchers**: MyPy error highlighting
+- **Extensions**: Recommended Python development extensions
+
+### Available Tasks (Ctrl/Cmd+Shift+P → "Tasks: Run Task"):
+- `mypy: Type Check` - Run static type checking
+- `pre-commit: Run All Checks` - Run all quality checks
+- `docker-build` - Build development container
+- `docker-run: debug` - Run container with debugging
+
+### Scripts:
+- `./scripts/type_check.sh` - Convenience script for type checking
+- `./scripts/pre_commit_check.sh` - Run all pre-commit checks manually
+
+## 📚 API Documentation
+
+### Swagger UI (Development Only):
+- **URL**: http://localhost:8000/docs
+- **Features**: Interactive API testing, schema visualization
+- **Security**: Automatically disabled in production
+
+### API Endpoints:
+- `GET /api/v1/health` - Health check endpoint
+- Returns: `{"status": "Healthy", "timestamp": "2025-01-08T..."}`
+
+## 🤝 Contributing
+
+1. **Setup Development Environment**:
+   ```bash
+   uv sync
+   source .venv/bin/activate
+   ```
+
+2. **Run Quality Checks**:
+   ```bash
+   uv run mypy app/          # Type checking
+   uv run pytest            # Tests
+   ```
+
+3. **Follow Conventions**:
+   - Use type hints everywhere
+   - Follow PEP 8 naming conventions
+   - Add docstrings to all public functions
+   - Write tests for new features
+
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🆘 Troubleshooting
+
+### Common Issues:
+
+**uv not found**:
+```bash
+# Install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+**Import errors in MyPy**:
+- Check `pyproject.toml` for missing type stubs
+- Add overrides for untyped libraries
+
+**Docker debugging not working**:
+- Ensure port 5678 is available
+- Check VS Code launch configuration
+
+**Rate limiting too strict**:
+- Adjust `rate_limiter` in `.env` file
+- Use `@limiter.exempt` for specific endpoints
+
+For more help, check the documentation in the `docs/` directory.
