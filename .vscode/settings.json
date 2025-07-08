@@ -6,22 +6,24 @@
   "editor.formatOnSave": true,
   "editor.fontLigatures": true,
   "editor.tabSize": 4,
-  "editor.defaultFormatter": "ms-python.black-formatter",
+  "editor.defaultFormatter": "charliermarsh.ruff",
 
   // ===========================
   // 🐍 Python Configuration
   // ===========================
-  "black-formatter.args": ["--line-length", "100"],
   "python.envFile": "${workspaceFolder}/.env",
   "python.analysis.typeCheckingMode": "standard",
-  "pylint.enabled": true,
-  "pylint.args": [
-      "--max-line-length=100",
-      "--disable=C0115,C0116",           // Disable missing docstring warnings (class, function)
-      "--disable=W0511",                 // Disable "TODO" warning
-      "--good-names=i,j,k,ex,Run,_,db",  // Allow short variable names for common cases
-      "--output-format=colorized"        // Color output in terminal
-  ],
+
+  // Ruff configuration (replaces Pylint + Black)
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit"
+    }
+  },
+
+  // Python testing
   "python.testing.pytestArgs": ["tests"],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,

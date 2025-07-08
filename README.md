@@ -1,6 +1,13 @@
 # Velais FastAPI Scaffold
 
-A production-ready FastAPI project scaffold with modern Python development tools, Docker support, and comprehensive type checking. This scaffold follows Python best practices and includes everything needed to build robust, scalable APIs.
+A production-ready FastAPI project scaffold with modern Python development tools, Docker supp**Automatic checks on every commit:**
+- ✅ **Code formatting** with Ruff
+- ✅ **Type checking** with MyPy
+- ✅ **Security scanning** with Bandit
+- ✅ **Test execution** with pytest
+- ✅ **File formatting** (trailing whitespace, end-of-file)
+- ✅ **Docker linting** with Hadolint
+- ✅ **OS file prevention** (prevents .DS_Store, Thumbs.db, etc.)d comprehensive type checking. This scaffold follows Python best practices and includes everything needed to build robust, scalable APIs.
 
 ## ✨ Features
 
