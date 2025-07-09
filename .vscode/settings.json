@@ -33,8 +33,21 @@
   // ===========================
   "cSpell.words": [
     "appuser",
+    "autoupdate",
+    "charliermarsh",
+    "classmethod",
+    "Dockerfiles",
+    "docstrings",
+    "isalnum",
+    "isort",
     "MYPY",
+    "noqa",
+    "nosec",
+    "pycodestyle",
+    "pyflakes",
     "pyproject",
-    "pytest"
+    "pytest",
+    "pyupgrade",
+    "timeunit"
   ]
 }

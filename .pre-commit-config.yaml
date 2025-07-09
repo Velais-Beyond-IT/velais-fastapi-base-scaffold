@@ -37,8 +37,10 @@ repos:
       - id: ruff
         description: Run Ruff linter
         args: [--fix]
+        files: ^app/.*\.py$
       - id: ruff-format
         description: Run Ruff formatter
+        files: ^app/.*\.py$
 
   # Check for OS-specific files
   - repo: https://github.com/pre-commit/pre-commit-hooks

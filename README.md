@@ -1,6 +1,8 @@
 # Velais FastAPI Scaffold
 
-A production-ready FastAPI project scaffold with modern Python development tools, Docker supp**Automatic checks on every commit:**
+A production-ready FastAPI project scaffold with modern Python development tools, Docker support, and comprehensive type checking. This scaffold follows Python best practices and includes everything needed to build robust, scalable APIs.
+
+**Automatic checks on every commit:**
 - ✅ **Code formatting** with Ruff
 - ✅ **Type checking** with MyPy
 - ✅ **Security scanning** with Bandit
@@ -35,7 +37,7 @@ A production-ready FastAPI project scaffold with modern Python development tools
 ### 1. Clone and Setup
 
 ```bash
-git clone <your-repo-url>
+git clone git@github.com:Velais-Beyond-IT/velais-fastapi-scaffold.git
 cd velais-fastapi-scaffold
 
 # Install dependencies with uv
@@ -53,7 +55,7 @@ Create a `.env` file in the project root:
 
 ```env
 env=development
-rate_limiter=5/minute
+rate_limiter=60/minute
 ```
 
 ### 3. Run the Application
@@ -192,9 +194,9 @@ docker run -p 8000:8000 velais-fastapi:prod
 ## 📁 Project Structure
 
 ```
-├── app/                           # Main application package
-│   ├── __init__.py               # Package initialization with docstring
-│   ├── main.py                   # FastAPI application entry point
+├── app/                         # Main application package
+│   ├── __init__.py              # Package initialization with docstring
+│   ├── main.py                  # FastAPI application entry point
 │   │
 │   ├── config/                   # Configuration management
 │   │   ├── __init__.py
@@ -204,7 +206,7 @@ docker run -p 8000:8000 velais-fastapi:prod
 │   ├── database/                # Database models and connections
 │   │   └── __init__.py          # Database package (ready for models)
 │   │
-│   ├── handlers/                # Custom exception handlers
+│   ├── handlers/                # Custom handlers
 │   │   ├── __init__.py
 │   │   └── rate_limit_exceeded_handler.py
 │   │
@@ -221,26 +223,26 @@ docker run -p 8000:8000 velais-fastapi:prod
 │       └── rate_limit_exceeded_response.py
 │
 ├── tests/                       # Test suite
-│   └── test_health_check.py    # Health endpoint tests
+│   └── test_health_check.py     # Health endpoint tests
 │
 ├── scripts/                     # Development scripts
-│   └── type_check.sh           # Type checking convenience script
+│   └── type_check.sh            # Type checking convenience script
 │
 ├── docs/                        # Documentation
-│   └── MYPY_GUIDE.md           # MyPy usage guide
+│   └── MYPY_GUIDE.md            # MyPy usage guide
 │
 ├── .vscode/                     # VS Code configuration
-│   ├── launch.json             # Debug configuration
-│   ├── settings.json           # Editor settings
-│   └── tasks.json              # Build/run tasks
+│   ├── launch.json              # Debug configuration
+│   ├── settings.json            # Editor settings
+│   └── tasks.json               # Build/run tasks
 │
-├── Dockerfile.debug             # Development container with debugging
-├── Dockerfile.stg              # Staging container
-├── Dockerfile.prod             # Production-optimized container
-├── pyproject.toml              # Project configuration with mypy settings
-├── uv.lock                     # Dependency lock file
-├── .env                        # Environment variables (create this)
-└── README.md                   # This documentation
+├── Dockerfile.debug              # Development container with debugging
+├── Dockerfile.stg                # Staging container
+├── Dockerfile.prod               # Production-optimized container
+├── pyproject.toml               # Project configuration with mypy settings
+├── uv.lock                      # Dependency lock file
+├── .env                         # Environment variables (create this)
+└── README.md                    # This documentation
 ```
 
 ## ⚙️ Configuration Management
@@ -251,10 +253,10 @@ Configure your application through environment variables in `.env`:
 
 ```env
 # Application environment
-env=development              # development, staging, production
+ENV=development              # development, staging, production
 
 # Rate limiting
-rate_limiter=5/minute       # Format: number/timeunit (second, minute, hour, day)
+RATE_LIMITER=60/minute       # Format: number/timeunit (second, minute, hour, day)
 
 # Add your custom settings here
 # DATABASE_URL=postgresql://...
@@ -298,7 +300,7 @@ Built-in rate limiting using slowapi:
 ### Configuration:
 ```python
 # In .env file
-rate_limiter=10/minute
+RATE_LIMITER=60/minute
 ```
 
 ### Exempting Endpoints:
@@ -333,7 +335,7 @@ uv run pytest --cov=app --cov-report=html
 ## 🚀 Production Deployment
 
 ### Environment Setup:
-1. Set `env=production` in your environment
+1. Set `ENV=production` in your environment
 2. Configure production database URLs
 3. Set up proper secrets management
 4. Use production Dockerfile
@@ -383,7 +385,199 @@ docker run -p 8000:8000 \
 
 ### API Endpoints:
 - `GET /api/v1/health` - Health check endpoint
-- Returns: `{"status": "Healthy", "timestamp": "2025-01-08T..."}`
+- Returns: `{"status": "healthy", "timestamp": "2025-01-08T..."}`
+
+## 📋 Schema Development Standards
+
+This project follows domain-driven schema organization using Pydantic v2. All API schemas are organized by business domain for better maintainability and team collaboration.
+
+### Schema Organization
+
+```
+app/schemas/
+├── __init__.py              # Main exports - all schemas imported here
+├── common.py               # Shared base models and utilities
+├── types.py                # Custom Pydantic types and validators
+├── health.py               # Health check schemas
+├── limiter.py              # Rate limiting schemas
+└── [domain].py             # Domain-specific schemas (users, orders, etc.)
+```
+
+### Adding New Schemas
+
+#### 1. Choose the Right Location
+
+**For new features/domains:**
+```python
+# Create: app/schemas/users.py
+# Create: app/schemas/orders.py
+# Create: app/schemas/products.py
+```
+
+**For shared/common patterns:**
+```python
+# Add to: app/schemas/common.py
+# Add to: app/schemas/types.py
+```
+
+#### 2. Follow Naming Conventions
+
+```python
+# ✅ Recommended naming patterns
+class UserCreateRequest(BaseModel):      # Request models
+class UserResponse(BaseModel):           # Response models
+class UserUpdateRequest(BaseModel):      # Update requests
+class UserListResponse(BaseModel):       # List responses
+class UserSearchFilters(BaseModel):      # Filter/query models
+
+# ❌ Avoid these patterns
+class User(BaseModel):                   # Too generic
+class UserModel(BaseModel):              # Redundant suffix
+class CreateUser(BaseModel):             # Inconsistent order
+```
+
+#### 3. Domain Schema Template
+
+When creating a new domain file (e.g., `app/schemas/users.py`):
+
+```python
+"""User-related Pydantic schemas."""
+
+from datetime import datetime
+from typing import Optional
+from uuid import UUID
+
+from pydantic import BaseModel, Field, EmailStr
+
+from .common import BaseResponse, PaginatedResponse
+
+
+class UserBase(BaseModel):
+    """Base user model with shared fields."""
+    username: str = Field(min_length=3, max_length=50)
+    email: EmailStr = Field(description="User's email address")
+
+
+class UserCreateRequest(UserBase):
+    """Schema for creating a new user."""
+    password: str = Field(min_length=8, description="User password")
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "username": "johndoe",
+                "email": "john@example.com",
+                "password": "securepassword123"
+            }
+        }
+    }
+
+
+class UserResponse(UserBase):
+    """Schema for user response data."""
+    id: UUID = Field(description="Unique user identifier")
+    created_at: datetime = Field(description="When user was created")
+
+    model_config = {"from_attributes": True}  # Enable ORM mode
+
+
+class UserListResponse(PaginatedResponse[UserResponse]):
+    """Paginated response for user lists."""
+    pass
+```
+
+#### 4. Update Schema Exports
+
+**Always add new schemas to `app/schemas/__init__.py`:**
+
+```python
+# Add your new imports
+from .users import (
+    UserCreateRequest,
+    UserResponse,
+    UserListResponse
+)
+
+# Add to __all__ list
+__all__ = [
+    # ... existing exports ...
+    # Users
+    "UserCreateRequest",
+    "UserResponse",
+    "UserListResponse",
+]
+```
+
+#### 5. Use in Routers
+
+```python
+from fastapi import APIRouter
+from app.schemas import UserCreateRequest, UserResponse
+
+router = APIRouter(prefix="/users", tags=["users"])
+
+@router.post("/", response_model=UserResponse, status_code=201)
+async def create_user(user_data: UserCreateRequest) -> UserResponse:
+    """Create a new user."""
+    # Implementation here
+    pass
+```
+
+### Schema Best Practices Checklist
+
+When creating schemas, ensure you:
+
+- [ ] **Use descriptive names** with proper suffixes (`Request`, `Response`)
+- [ ] **Add docstrings** to all classes
+- [ ] **Include field descriptions** using `Field(description="...")`
+- [ ] **Add validation** with Field constraints (min_length, pattern, etc.)
+- [ ] **Provide examples** using `model_config` with `json_schema_extra`
+- [ ] **Use type hints** properly (`Optional`, `List[T]`, `Literal`)
+- [ ] **Export in `__init__.py`** for easy imports
+- [ ] **Follow domain organization** (group related schemas)
+- [ ] **Use base models** for shared fields
+- [ ] **Enable ORM mode** with `from_attributes=True` when needed
+
+### Common Patterns
+
+**Pagination**:
+```python
+from .common import PaginatedResponse
+
+class ProductListResponse(PaginatedResponse[ProductResponse]):
+    pass
+```
+
+**Base + Specific Models**:
+```python
+class ProductBase(BaseModel):
+    name: str
+    price: float
+
+class ProductCreateRequest(ProductBase):
+    pass
+
+class ProductResponse(ProductBase):
+    id: UUID
+    created_at: datetime
+```
+
+**Custom Validation**:
+```python
+from pydantic import field_validator
+
+class UserCreateRequest(BaseModel):
+    username: str
+
+    @field_validator('username')
+    @classmethod
+    def username_alphanumeric(cls, v: str) -> str:
+        if not v.isalnum():
+            raise ValueError('Username must be alphanumeric')
+        return v
+```
+
+📖 **For detailed schema development guidelines, see `docs/DEVELOPMENT_GUIDE.md`**
 
 ## 🤝 Contributing
 
@@ -395,7 +589,7 @@ docker run -p 8000:8000 \
 
 2. **Run Quality Checks**:
    ```bash
-   uv run mypy app/          # Type checking
+   uv run mypy app/         # Type checking
    uv run pytest            # Tests
    ```
 

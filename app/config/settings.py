@@ -12,11 +12,11 @@ class Settings(BaseSettings):
 
     Attributes:
         env (str): Application environment (e.g., development or production).
-        rate_limiter (str): Configuration for rate limiting (e.g., "5/minute").
+        rate_limiter (str): Configuration for rate limiting (e.g., "60/minute").
     """
 
     env: str = "development"
-    rate_limiter: str = "5/minute"
+    rate_limiter: str = "60/minute"
 
     model_config = SettingsConfigDict(env_file=".env")
 

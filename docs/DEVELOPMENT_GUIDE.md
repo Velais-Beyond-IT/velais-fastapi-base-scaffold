@@ -218,3 +218,256 @@ This ensures the same quality standards in your CI pipeline.
 5. **Keep dependencies updated**: Run `uv run pre-commit autoupdate` periodically
 
 This ensures consistent, high-quality code across the entire team! 🚀
+
+## Schema Organization & Development
+
+### Pydantic v2 Schema Standards
+
+This project follows domain-driven schema organization using Pydantic v2. All schemas are organized by business domain rather than by type (request/response).
+
+#### Schema Directory Structure
+
+```
+app/schemas/
+├── __init__.py              # Main exports - import all schemas here
+├── common.py               # Shared base models and utilities
+├── types.py                # Custom Pydantic types and validators
+├── health.py               # Health check schemas
+├── limiter.py              # Rate limiting schemas
+├── users.py                # User-related schemas (when added)
+├── auth.py                 # Authentication schemas (when added)
+└── [domain].py             # Other domain-specific schemas
+```
+
+#### Adding New Schemas
+
+Follow these steps when adding new schemas to the project:
+
+##### 1. Choose the Right File
+
+**Domain-Specific Schemas** (Recommended):
+- Create or use existing domain file: `app/schemas/users.py`, `app/schemas/orders.py`
+- Group related request, response, and data models together
+
+**Shared/Common Schemas**:
+- Add to `app/schemas/common.py` for base classes and utilities
+- Add to `app/schemas/types.py` for custom types and validators
+
+##### 2. Schema Naming Conventions
+
+```python
+# ✅ Good naming examples
+class UserCreateRequest(BaseModel):      # Request models
+class UserResponse(BaseModel):           # Response models
+class UserUpdateRequest(BaseModel):      # Update requests
+class UserListResponse(BaseModel):       # List responses
+class UserSearchFilters(BaseModel):      # Filter models
+
+# ❌ Avoid these patterns
+class User(BaseModel):                   # Too generic
+class UserModel(BaseModel):              # Redundant suffix
+class CreateUser(BaseModel):             # Inconsistent order
+```
+
+##### 3. Domain Schema Template
+
+When creating a new domain file (e.g., `app/schemas/users.py`):
+
+```python
+"""User-related Pydantic schemas."""
+
+from datetime import datetime
+from typing import Optional, List
+from uuid import UUID
+
+from pydantic import BaseModel, Field, EmailStr
+
+from .common import BaseResponse, PaginatedResponse
+
+
+# Base user model (shared fields)
+class UserBase(BaseModel):
+    """Base user model with common fields."""
+
+    username: str = Field(min_length=3, max_length=50, pattern=r"^[a-zA-Z0-9_]+$")
+    email: EmailStr = Field(description="User's email address")
+    first_name: str = Field(min_length=1, max_length=100)
+    last_name: str = Field(min_length=1, max_length=100)
+
+
+# Request models
+class UserCreateRequest(UserBase):
+    """Schema for creating a new user."""
+
+    password: str = Field(min_length=8, max_length=128, description="User password")
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "username": "johndoe",
+                "email": "john@example.com",
+                "first_name": "John",
+                "last_name": "Doe",
+                "password": "securepassword123"
+            }
+        }
+    }
+
+
+class UserUpdateRequest(BaseModel):
+    """Schema for updating user information."""
+
+    first_name: Optional[str] = Field(None, min_length=1, max_length=100)
+    last_name: Optional[str] = Field(None, min_length=1, max_length=100)
+    email: Optional[EmailStr] = None
+
+
+# Response models
+class UserResponse(UserBase):
+    """Schema for user response data."""
+
+    id: UUID = Field(description="Unique user identifier")
+    is_active: bool = Field(default=True, description="Whether user is active")
+    created_at: datetime = Field(description="When user was created")
+    updated_at: datetime = Field(description="When user was last updated")
+
+    model_config = {
+        "from_attributes": True,  # Enable ORM mode for SQLAlchemy
+        "json_schema_extra": {
+            "example": {
+                "id": "123e4567-e89b-12d3-a456-426614174000",
+                "username": "johndoe",
+                "email": "john@example.com",
+                "first_name": "John",
+                "last_name": "Doe",
+                "is_active": True,
+                "created_at": "2025-01-09T12:00:00Z",
+                "updated_at": "2025-01-09T12:00:00Z"
+            }
+        }
+    }
+
+
+class UserListResponse(PaginatedResponse[UserResponse]):
+    """Paginated response for user lists."""
+    pass
+```
+
+##### 4. Update Schema Exports
+
+Always add new schemas to `app/schemas/__init__.py`:
+
+```python
+"""
+Pydantic schemas for the FastAPI application.
+"""
+
+# Health schemas
+from .health import HealthResponse
+
+# Rate limiting schemas
+from .limiter import RateLimitExceededResponse
+
+# User schemas (example)
+from .users import (
+    UserCreateRequest,
+    UserUpdateRequest,
+    UserResponse,
+    UserListResponse
+)
+
+# Common schemas
+from .common import BaseResponse, PaginatedResponse, ErrorResponse
+
+__all__ = [
+    # Health
+    "HealthResponse",
+    # Rate limiting
+    "RateLimitExceededResponse",
+    # Users
+    "UserCreateRequest",
+    "UserUpdateRequest",
+    "UserResponse",
+    "UserListResponse",
+    # Common
+    "BaseResponse",
+    "PaginatedResponse",
+    "ErrorResponse",
+]
+```
+
+##### 5. Router Integration
+
+Use schemas in your routers:
+
+```python
+from fastapi import APIRouter, HTTPException
+from app.schemas import UserCreateRequest, UserResponse, UserListResponse
+
+router = APIRouter(prefix="/users", tags=["users"])
+
+@router.post("/", response_model=UserResponse, status_code=201)
+async def create_user(user_data: UserCreateRequest) -> UserResponse:
+    """Create a new user."""
+    # Implementation here
+    pass
+
+@router.get("/", response_model=UserListResponse)
+async def list_users(
+    page: int = 1,
+    size: int = 20
+) -> UserListResponse:
+    """List users with pagination."""
+    # Implementation here
+    pass
+```
+
+#### Best Practices Checklist
+
+When creating schemas, ensure you:
+
+- [ ] **Use descriptive names** with proper suffixes (`Request`, `Response`)
+- [ ] **Add docstrings** to all classes and important fields
+- [ ] **Include field descriptions** using `Field(description="...")`
+- [ ] **Add validation** with `Field` constraints (min_length, max_length, gt, etc.)
+- [ ] **Provide examples** using `model_config` with `json_schema_extra`
+- [ ] **Use type hints** properly (`Optional`, `List[T]`, `Literal`)
+- [ ] **Inherit from base models** when appropriate
+- [ ] **Export in `__init__.py`** for easy imports
+- [ ] **Follow naming conventions** consistently
+- [ ] **Add custom validators** when needed using `@field_validator`
+
+#### Common Patterns
+
+**Pagination Response**:
+```python
+from .common import PaginatedResponse
+
+class ProductListResponse(PaginatedResponse[ProductResponse]):
+    """Paginated list of products."""
+    pass
+```
+
+**Base + Specific Models**:
+```python
+class ProductBase(BaseModel):
+    name: str
+    price: float
+
+class ProductCreateRequest(ProductBase):
+    pass
+
+class ProductResponse(ProductBase):
+    id: UUID
+    created_at: datetime
+```
+
+**Error Responses**:
+```python
+from .common import ErrorResponse
+
+# Use the common ErrorResponse model
+# No need to create domain-specific error models
+```
+
+Following these standards ensures consistency, maintainability, and excellent developer experience across the entire team! 🚀
