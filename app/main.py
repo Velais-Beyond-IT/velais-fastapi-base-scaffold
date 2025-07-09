@@ -8,7 +8,7 @@ from starlette.middleware.cors import CORSMiddleware
 from app.config.limiter import limiter
 from app.config.settings import settings
 from app.handlers.rate_limit_exceeded_handler import rate_limit_exceeded_handler
-from app.routers import health_check
+from app.routers import health
 
 # Configure logging
 logging.basicConfig(
@@ -44,4 +44,4 @@ app.add_middleware(SlowAPIMiddleware)
 app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
 
 # Add API routes
-app.include_router(health_check.router, prefix="/api/v1", tags=["Health"])
+app.include_router(health.router, prefix="/api/v1", tags=["Health"])
