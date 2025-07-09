@@ -1,4 +1,6 @@
 import logging
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from slowapi.errors import RateLimitExceeded
@@ -19,12 +21,37 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+@asynccontextmanager
+async def lifespan(app_instance: FastAPI) -> AsyncGenerator[None]:
+    """Manage application lifespan events."""
+    # Startup
+    logger.info("🚀 Starting %s", app_instance.title)
+    logger.info("Environment: %s", settings.env)
+    logger.info("CORS Origins: %s", settings.get_cors_origins())
+    logger.info("CORS Methods: %s", settings.get_cors_methods())
+    logger.info("CORS Headers: %s", settings.get_cors_headers())
+    logger.info("CORS Allow Credentials: %s", settings.cors_allow_credentials)
+    logger.info("CORS Max Age: %s seconds", settings.cors_max_age)
+    logger.info("Rate Limiter: %s", settings.rate_limiter)
+    logger.info(
+        "Documentation URL: %s",
+        "/docs" if settings.env == "development" else "disabled",
+    )
+    logger.info("✅ Application startup complete")
+
+    yield
+
+    # Shutdown
+    logger.info("🛑 Application shutdown complete")
+
+
 app = FastAPI(
-    title="<PROJECT_NAME> API",
+    title="<Application Title>",
     description="""
-    <PROJECT_DESCRIPTION>
+    <Application Description>
     """,
     version="1.0.0",
+    lifespan=lifespan,
     redoc_url=None,
     docs_url="/docs" if settings.env == "development" else None,
 )
@@ -33,11 +60,6 @@ app = FastAPI(
 cors_origins = settings.get_cors_origins()
 cors_methods = settings.get_cors_methods()
 cors_headers = settings.get_cors_headers()
-
-logger.info("Environment: %s", settings.env)
-logger.info("CORS Origins: %s", cors_origins)
-logger.info("CORS Methods: %s", cors_methods)
-logger.info("CORS Headers: %s", cors_headers)
 
 app.add_middleware(
     CORSMiddleware,
