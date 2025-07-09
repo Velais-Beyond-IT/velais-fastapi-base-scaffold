@@ -11,6 +11,9 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PATH="/app/.venv/bin:$PATH"
 
+# Production environment settings
+ENV ENV=development
+
 # Disable file validation for debugpy
 ENV PYDEVD_DISABLE_FILE_VALIDATION=1
 

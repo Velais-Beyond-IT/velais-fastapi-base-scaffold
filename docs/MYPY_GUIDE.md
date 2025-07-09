@@ -18,7 +18,7 @@ MyPy is configured in `pyproject.toml` with:
 uv run mypy app/
 
 # Check specific file
-uv run mypy app/routers/health_check.py
+uv run mypy app/routers/health.py
 
 # Check with verbose output
 uv run mypy app/ --verbose

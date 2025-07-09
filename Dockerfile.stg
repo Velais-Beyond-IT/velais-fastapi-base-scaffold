@@ -6,14 +6,13 @@ FROM python:${PYTHON_VERSION}-slim AS base
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
-# Prevents Python from writing pyc files
+# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
-
-# Keeps Python from buffering stdout and stderr
 ENV PYTHONUNBUFFERED=1
-
-# Set the virtual environment path
 ENV PATH="/app/.venv/bin:$PATH"
+
+# Environment-specific settings
+ENV ENV=staging
 
 WORKDIR /app
 

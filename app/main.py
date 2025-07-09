@@ -7,7 +7,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.config.limiter import limiter
 from app.config.settings import settings
-from app.handlers.rate_limit_exceeded_handler import rate_limit_exceeded_handler
+from app.handlers.rate_limit_exceeded import rate_limit_exceeded_handler
 from app.routers import health
 
 # Configure logging
@@ -29,13 +29,23 @@ app = FastAPI(
     docs_url="/docs" if settings.env == "development" else None,
 )
 
-# Add CORS middleware
+# Add CORS middleware with environment-specific configuration
+cors_origins = settings.get_cors_origins()
+cors_methods = settings.get_cors_methods()
+cors_headers = settings.get_cors_headers()
+
+logger.info("Environment: %s", settings.env)
+logger.info("CORS Origins: %s", cors_origins)
+logger.info("CORS Methods: %s", cors_methods)
+logger.info("CORS Headers: %s", cors_headers)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=cors_origins,
+    allow_credentials=settings.cors_allow_credentials,
+    allow_methods=cors_methods,
+    allow_headers=cors_headers,
+    max_age=settings.cors_max_age,
 )
 
 # Add the Limiter middleware with the custom handler

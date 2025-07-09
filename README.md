@@ -9,20 +9,20 @@ A production-ready FastAPI project scaffold with modern Python development tools
 - ✅ **Test execution** with pytest
 - ✅ **File formatting** (trailing whitespace, end-of-file)
 - ✅ **Docker linting** with Hadolint
-- ✅ **OS file prevention** (prevents .DS_Store, Thumbs.db, etc.)d comprehensive type checking. This scaffold follows Python best practices and includes everything needed to build robust, scalable APIs.
+- ✅ **OS file prevention** (prevents .DS_Store, Thumbs.db, etc.)
 
 ## ✨ Features
 
 - 🚀 **FastAPI**: Modern, fast web framework with automatic API documentation
 - 🐳 **Docker**: Multi-stage builds for development, staging, and production
 - 🔧 **uv**: Ultra-fast Python package installer and resolver
-- � **MyPy**: Static type checking with Pydantic v2 integration
+- 🔍 **MyPy**: Static type checking with Pydantic v2 integration
 - 🚦 **Rate Limiting**: Built-in API rate limiting with slowapi
 - ⚙️ **Configuration**: Environment-based config with pydantic-settings
 - 🧪 **Testing**: Comprehensive test suite with pytest
 - 📝 **Documentation**: Auto-generated API docs with Swagger UI
 - 🔒 **Security**: CORS middleware and production-ready configurations
-- � **Debugging**: VS Code debugging support with Docker
+- 🐛 **Debugging**: VS Code debugging support with Docker
 - 📊 **Code Quality**: Pre-configured linting and formatting tools
 
 ## 🛠 Prerequisites
@@ -51,12 +51,16 @@ source .venv/bin/activate  # Linux/MacOS
 
 ### 2. Environment Configuration
 
-Create a `.env` file in the project root:
+Copy the example environment file and customize as needed:
 
-```env
-env=development
-rate_limiter=60/minute
+```bash
+cp .env.example .env
 ```
+
+The `.env` file includes configuration for:
+- Application environment (`ENV=development`)
+- Rate limiting settings (`RATE_LIMITER=60/minute`)
+- CORS configuration (automatically secure based on environment)
 
 ### 3. Run the Application
 
@@ -97,7 +101,7 @@ uv run pytest
 uv run pytest --cov=app
 
 # Run specific test file
-uv run pytest tests/test_health_check.py -v
+uv run pytest tests/test_health.py -v
 ```
 
 ### Code Quality Tools
@@ -215,21 +219,30 @@ docker run -p 8000:8000 velais-fastapi:prod
 │   │
 │   ├── routers/                 # API route definitions
 │   │   ├── __init__.py
-│   │   └── health_check.py      # Health check endpoint
+│   │   └── health.py            # Health check endpoint
 │   │
-│   └── schemas/                 # Pydantic models for API
-│       ├── __init__.py          # Schemas package with docstring
-│       ├── health_response.py   # Health check response schema
-│       └── rate_limit_exceeded_response.py
+│   ├── schemas/                 # Pydantic models for API
+│   │   ├── __init__.py          # Schemas package with docstring
+│   │   ├── health.py            # Health check response schema
+│   │   └── limiter.py           # Rate limiting response schema
+│   │
+│   └── utils/                   # Utility modules
+│       ├── __init__.py          # Utils package exports
+│       └── cors.py              # CORS configuration utilities
 │
 ├── tests/                       # Test suite
-│   └── test_health_check.py     # Health endpoint tests
+│   ├── test_health.py           # Health endpoint tests
+│   └── test_cors.py             # CORS configuration tests
 │
 ├── scripts/                     # Development scripts
+│   ├── pre_commit_check.sh      # Pre-commit checks script
 │   └── type_check.sh            # Type checking convenience script
 │
 ├── docs/                        # Documentation
-│   └── MYPY_GUIDE.md            # MyPy usage guide
+│   ├── CORS_CONFIGURATION.md    # CORS security guide
+│   ├── DEVELOPMENT_GUIDE.md     # Development guidelines
+│   ├── MYPY_GUIDE.md            # MyPy usage guide
+│   └── SCHEMA_QUICK_REFERENCE.md # Schema development standards
 │
 ├── .vscode/                     # VS Code configuration
 │   ├── launch.json              # Debug configuration
@@ -241,7 +254,7 @@ docker run -p 8000:8000 velais-fastapi:prod
 ├── Dockerfile.prod               # Production-optimized container
 ├── pyproject.toml               # Project configuration with mypy settings
 ├── uv.lock                      # Dependency lock file
-├── .env                         # Environment variables (create this)
+├── .env.example                 # Environment variables template
 └── README.md                    # This documentation
 ```
 
@@ -258,10 +271,54 @@ ENV=development              # development, staging, production
 # Rate limiting
 RATE_LIMITER=60/minute       # Format: number/timeunit (second, minute, hour, day)
 
+# CORS Configuration
+CORS_ORIGINS=*               # Development: *, Production: https://yourapp.com,https://admin.yourapp.com
+CORS_ALLOW_CREDENTIALS=true  # Whether to allow credentials in CORS requests
+CORS_ALLOW_METHODS=*         # Allowed HTTP methods (or specific: GET,POST,PUT,DELETE,OPTIONS,PATCH)
+CORS_ALLOW_HEADERS=*         # Allowed headers (or specific: Authorization,Content-Type,Accept)
+CORS_MAX_AGE=86400          # Preflight cache duration in seconds
+
 # Add your custom settings here
 # DATABASE_URL=postgresql://...
 # REDIS_URL=redis://...
 ```
+
+### CORS Security by Environment
+
+The application automatically adjusts CORS settings based on the environment:
+
+| Environment | CORS Origins | Security Level |
+|-------------|--------------|----------------|
+| **Development** | `*` (all origins) | Permissive for fast development |
+| **Staging** | Specific domains only | Secure, staging domains |
+| **Production** | Specific domains only | Maximum security, HTTPS enforced |
+
+#### Example Configurations
+
+For local development, copy the example environment file:
+```bash
+cp .env.example .env
+```
+
+**Development (`.env.example`)**:
+```env
+ENV=development
+CORS_ORIGINS=*
+```
+
+**Staging** (set via deployment):
+```env
+ENV=staging
+CORS_ORIGINS=https://staging.yourapp.com,https://staging-admin.yourapp.com
+```
+
+**Production** (set via deployment):
+```env
+ENV=production
+CORS_ORIGINS=https://yourapp.com,https://www.yourapp.com,https://admin.yourapp.com
+```
+
+📖 **For comprehensive CORS security guidelines and troubleshooting, see [`docs/CORS_CONFIGURATION.md`](docs/CORS_CONFIGURATION.md)**
 
 ### Settings Class
 
@@ -273,6 +330,11 @@ from app.config.settings import settings
 # Access settings anywhere in your app
 print(f"Environment: {settings.env}")
 print(f"Rate limit: {settings.rate_limiter}")
+
+# CORS settings
+origins = settings.get_cors_origins()      # Returns list of allowed origins
+methods = settings.get_cors_methods()      # Returns list of allowed methods
+headers = settings.get_cors_headers()      # Returns list of allowed headers
 ```
 
 ## 🔍 Type Checking
