@@ -1,7 +1,7 @@
 #!/bin/bash
 # Type checking script for development workflow
 echo "🔍 Running mypy type checker..."
-uv run mypy app/
+uv run mypy src/
 MYPY_EXIT_CODE=$?
 
 if [ $MYPY_EXIT_CODE -eq 0 ]; then

@@ -2,8 +2,8 @@ import logging
 
 from fastapi import APIRouter, Request
 
-from app.config.limiter import limiter
-from app.schemas import HealthResponse
+from src.config.limiter import limiter
+from src.schemas import HealthResponse
 
 logger = logging.getLogger(__name__)
 

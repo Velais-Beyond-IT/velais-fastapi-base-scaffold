@@ -228,7 +228,7 @@ This project follows domain-driven schema organization using Pydantic v2. All sc
 #### Schema Directory Structure
 
 ```
-app/schemas/
+src/schemas/
 ├── __init__.py              # Main exports - import all schemas here
 ├── common.py               # Shared base models and utilities
 ├── types.py                # Custom Pydantic types and validators
@@ -246,12 +246,12 @@ Follow these steps when adding new schemas to the project:
 ##### 1. Choose the Right File
 
 **Domain-Specific Schemas** (Recommended):
-- Create or use existing domain file: `app/schemas/users.py`, `app/schemas/orders.py`
+- Create or use existing domain file: `src/schemas/users.py`, `src/schemas/orders.py`
 - Group related request, response, and data models together
 
 **Shared/Common Schemas**:
-- Add to `app/schemas/common.py` for base classes and utilities
-- Add to `app/schemas/types.py` for custom types and validators
+- Add to `src/schemas/common.py` for base classes and utilities
+- Add to `src/schemas/types.py` for custom types and validators
 
 ##### 2. Schema Naming Conventions
 
@@ -271,7 +271,7 @@ class CreateUser(BaseModel):             # Inconsistent order
 
 ##### 3. Domain Schema Template
 
-When creating a new domain file (e.g., `app/schemas/users.py`):
+When creating a new domain file (e.g., `src/schemas/users.py`):
 
 ```python
 """User-related Pydantic schemas."""
@@ -355,7 +355,7 @@ class UserListResponse(PaginatedResponse[UserResponse]):
 
 ##### 4. Update Schema Exports
 
-Always add new schemas to `app/schemas/__init__.py`:
+Always add new schemas to `src/schemas/__init__.py`:
 
 ```python
 """
@@ -402,7 +402,7 @@ Use schemas in your routers:
 
 ```python
 from fastapi import APIRouter, HTTPException
-from app.schemas import UserCreateRequest, UserResponse, UserListResponse
+from src.schemas import UserCreateRequest, UserResponse, UserListResponse
 
 router = APIRouter(prefix="/users", tags=["users"])
 

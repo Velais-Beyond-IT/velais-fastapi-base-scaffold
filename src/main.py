@@ -7,10 +7,10 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
-from app.config.limiter import limiter
-from app.config.settings import settings
-from app.handlers.rate_limit_exceeded import rate_limit_exceeded_handler
-from app.routers import health
+from src.config.limiter import limiter
+from src.config.settings import settings
+from src.handlers.rate_limit_exceeded import rate_limit_exceeded_handler
+from src.routers import health
 
 # Configure logging
 logging.basicConfig(

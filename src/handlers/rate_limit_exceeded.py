@@ -4,7 +4,7 @@ from fastapi import Request, Response
 from slowapi.errors import RateLimitExceeded
 from starlette.responses import JSONResponse
 
-from app.schemas import RateLimitExceededResponse
+from src.schemas import RateLimitExceededResponse
 
 logger = logging.getLogger(__name__)
 

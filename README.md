@@ -66,10 +66,10 @@ The `.env` file includes configuration for:
 
 ```bash
 # Using uv (recommended)
-uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uv run uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
 
 # Or with activated environment
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 The API will be available at:
@@ -83,7 +83,7 @@ The API will be available at:
 
 ```bash
 # Run type checking
-uv run mypy app/
+uv run mypy src/
 
 # Using the convenience script
 ./scripts/type_check.sh
@@ -98,7 +98,7 @@ uv run mypy app/
 uv run pytest
 
 # Run with coverage
-uv run pytest --cov=app
+uv run pytest --cov=src
 
 # Run specific test file
 uv run pytest tests/test_health.py -v
@@ -108,14 +108,14 @@ uv run pytest tests/test_health.py -v
 
 ```bash
 # Type checking
-uv run mypy app/
+uv run mypy src/
 
 # Linting and formatting
-uv run ruff check app/
-uv run ruff format app/
+uv run ruff check src/
+uv run ruff format src/
 
 # Security scanning
-uv run bandit -r app/
+uv run bandit -r src/
 
 # Run tests
 uv run pytest
@@ -198,7 +198,7 @@ docker run -p 8000:8000 velais-fastapi:prod
 ## 📁 Project Structure
 
 ```
-├── app/                         # Main application package
+├── src/                         # Main application package
 │   ├── __init__.py              # Package initialization with docstring
 │   ├── main.py                  # FastAPI application entry point
 │   │
@@ -322,10 +322,10 @@ CORS_ORIGINS=https://yourapp.com,https://www.yourapp.com,https://admin.yourapp.c
 
 ### Settings Class
 
-The `app.config.settings.Settings` class manages all configuration:
+The `src.config.settings.Settings` class manages all configuration:
 
 ```python
-from app.config.settings import settings
+from src.config.settings import settings
 
 # Access settings anywhere in your app
 print(f"Environment: {settings.env}")
@@ -367,7 +367,7 @@ RATE_LIMITER=60/minute
 
 ### Exempting Endpoints:
 ```python
-from app.config.limiter import limiter
+from src.config.limiter import limiter
 
 @router.get("/unlimited")
 @limiter.exempt  # type: ignore[misc]
@@ -391,7 +391,7 @@ uv run pytest
 uv run pytest -v
 
 # With coverage report
-uv run pytest --cov=app --cov-report=html
+uv run pytest --cov=src --cov-report=html
 ```
 
 ## 🚀 Production Deployment
@@ -456,7 +456,7 @@ This project follows domain-driven schema organization using Pydantic v2. All AP
 ### Schema Organization
 
 ```
-app/schemas/
+src/schemas/
 ├── __init__.py              # Main exports - all schemas imported here
 ├── common.py               # Shared base models and utilities
 ├── types.py                # Custom Pydantic types and validators
@@ -471,15 +471,15 @@ app/schemas/
 
 **For new features/domains:**
 ```python
-# Create: app/schemas/users.py
-# Create: app/schemas/orders.py
-# Create: app/schemas/products.py
+# Create: src/schemas/users.py
+# Create: src/schemas/orders.py
+# Create: src/schemas/products.py
 ```
 
 **For shared/common patterns:**
 ```python
-# Add to: app/schemas/common.py
-# Add to: app/schemas/types.py
+# Add to: src/schemas/common.py
+# Add to: src/schemas/types.py
 ```
 
 #### 2. Follow Naming Conventions
@@ -500,7 +500,7 @@ class CreateUser(BaseModel):             # Inconsistent order
 
 #### 3. Domain Schema Template
 
-When creating a new domain file (e.g., `app/schemas/users.py`):
+When creating a new domain file (e.g., `src/schemas/users.py`):
 
 ```python
 """User-related Pydantic schemas."""
@@ -550,7 +550,7 @@ class UserListResponse(PaginatedResponse[UserResponse]):
 
 #### 4. Update Schema Exports
 
-**Always add new schemas to `app/schemas/__init__.py`:**
+**Always add new schemas to `src/schemas/__init__.py`:**
 
 ```python
 # Add your new imports
@@ -574,7 +574,7 @@ __all__ = [
 
 ```python
 from fastapi import APIRouter
-from app.schemas import UserCreateRequest, UserResponse
+from src.schemas import UserCreateRequest, UserResponse
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -651,7 +651,7 @@ class UserCreateRequest(BaseModel):
 
 2. **Run Quality Checks**:
    ```bash
-   uv run mypy app/         # Type checking
+   uv run mypy src/         # Type checking
    uv run pytest            # Tests
    ```
 

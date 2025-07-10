@@ -37,10 +37,10 @@ repos:
       - id: ruff
         description: Run Ruff linter
         args: [--fix]
-        files: ^app/.*\.py$
+        files: ^src/.*\.py$
       - id: ruff-format
         description: Run Ruff formatter
-        files: ^app/.*\.py$
+        files: ^src/.*\.py$
 
   # Check for OS-specific files
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -71,7 +71,7 @@ repos:
         entry: uv run mypy
         language: system
         types: [python]
-        files: ^app/
+        files: ^src/
         description: Run mypy static type checker
         require_serial: false
 

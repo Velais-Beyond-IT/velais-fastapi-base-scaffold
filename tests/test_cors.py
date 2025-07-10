@@ -2,8 +2,8 @@
 
 import pytest
 
-from app.config.settings import Settings
-from app.utils.cors import is_cors_secure, parse_cors_origins, validate_origin
+from src.config.settings import Settings
+from src.utils.cors import is_cors_secure, parse_cors_origins, validate_origin
 
 
 def test_validate_origin():

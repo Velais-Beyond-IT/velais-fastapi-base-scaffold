@@ -3,8 +3,8 @@
 ## 🎯 Quick Checklist for New Schemas
 
 ### 1. File Organization
-- [ ] Create domain-specific file: `app/schemas/[domain].py`
-- [ ] Or add to existing: `app/schemas/common.py` or `app/schemas/types.py`
+- [ ] Create domain-specific file: `src/schemas/[domain].py`
+- [ ] Or add to existing: `src/schemas/common.py` or `src/schemas/types.py`
 
 ### 2. Naming Convention
 - [ ] Use descriptive names: `UserCreateRequest`, `UserResponse`
@@ -19,7 +19,7 @@
 - [ ] Use proper type hints
 
 ### 4. Exports & Integration
-- [ ] Add to `app/schemas/__init__.py` imports
+- [ ] Add to `src/schemas/__init__.py` imports
 - [ ] Add to `__all__` list
 - [ ] Use in router with `response_model`
 

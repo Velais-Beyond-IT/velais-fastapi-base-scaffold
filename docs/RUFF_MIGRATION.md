@@ -8,29 +8,29 @@ We've migrated from **multiple legacy tools** to **Ruff** for all Python linting
 ```bash
 # Multiple tools needed
 pip install pylint black isort flake8 pyupgrade
-pylint app/                    # ~30 seconds
-black app/                     # ~10 seconds
-isort app/                     # ~5 seconds
-flake8 app/                    # ~15 seconds
+pylint src/                    # ~30 seconds
+black src/                     # ~10 seconds
+isort src/                     # ~5 seconds
+flake8 src/                    # ~15 seconds
 ```
 
 ### After (Ruff)
 ```bash
 # Single tool does it all
 uv add --dev ruff
-uv run ruff check app/         # ~0.1 seconds
-uv run ruff format app/        # ~0.1 seconds
+uv run ruff check src/         # ~0.1 seconds
+uv run ruff format src/        # ~0.1 seconds
 ```
 
 ## 🔄 Command Migration
 
 | Old Command | New Ruff Command |
 |-------------|------------------|
-| `pylint app/` | `uv run ruff check app/` |
-| `black app/` | `uv run ruff format app/` |
-| `black --check app/` | `uv run ruff format --check app/` |
-| `isort app/` | `uv run ruff check --fix app/` (I rules) |
-| `flake8 app/` | `uv run ruff check app/` |
+| `pylint src/` | `uv run ruff check src/` |
+| `black src/` | `uv run ruff format src/` |
+| `black --check src/` | `uv run ruff format --check src/` |
+| `isort src/` | `uv run ruff check --fix src/` (I rules) |
+| `flake8 src/` | `uv run ruff check src/` |
 
 ## 🛠️ VS Code Setup
 

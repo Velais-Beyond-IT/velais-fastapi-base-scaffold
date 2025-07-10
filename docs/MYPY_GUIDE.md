@@ -14,14 +14,14 @@ MyPy is configured in `pyproject.toml` with:
 
 ### Command Line
 ```bash
-# Check all app code
-uv run mypy app/
+# Check all src code
+uv run mypy src/
 
 # Check specific file
-uv run mypy app/routers/health.py
+uv run mypy src/routers/health.py
 
 # Check with verbose output
-uv run mypy app/ --verbose
+uv run mypy src/ --verbose
 ```
 
 ### VS Code
@@ -97,7 +97,7 @@ class UserSchema(BaseModel):
 Add to your GitHub Actions or similar:
 ```yaml
 - name: Type check with mypy
-  run: uv run mypy app/
+  run: uv run mypy src/
 ```
 
 ## Troubleshooting
@@ -113,7 +113,7 @@ ignore_missing_imports = true
 ### Performance Issues
 For large codebases, use:
 ```bash
-uv run mypy app/ --cache-dir=.mypy_cache
+uv run mypy src/ --cache-dir=.mypy_cache
 ```
 
 This ensures type safety and better code quality throughout the development process.

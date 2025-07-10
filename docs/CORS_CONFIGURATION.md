@@ -25,7 +25,7 @@ This project implements environment-aware CORS configuration that balances devel
 
 ### Built-in Security Checks
 ```python
-from app.utils.cors import is_cors_secure
+from src.utils.cors import is_cors_secure
 
 # Automatically validates CORS configuration
 assert is_cors_secure(["*"], "development") is True        # ✅ OK in dev
@@ -69,7 +69,7 @@ CORS_ALLOW_HEADERS=Authorization,Content-Type,X-Requested-With,Accept,Origin
 
 ### Settings Access
 ```python
-from app.config.settings import settings
+from src.config.settings import settings
 
 # Get environment-appropriate origins
 origins = settings.get_cors_origins()
@@ -80,7 +80,7 @@ origins = settings.get_cors_origins()
 
 ### Manual Validation
 ```python
-from app.utils.cors import validate_origin, is_cors_secure
+from src.utils.cors import validate_origin, is_cors_secure
 
 # Validate individual origins
 assert validate_origin("https://example.com") is True
@@ -120,8 +120,8 @@ uv run pytest tests/test_cors.py::test_cors_configuration_integration -v
 ### Manual Testing
 ```bash
 # Test different environments
-ENV=development uv run python -c "from app.config.settings import settings; print(settings.get_cors_origins())"
-ENV=production CORS_ORIGINS=https://example.com uv run python -c "from app.config.settings import settings; print(settings.get_cors_origins())"
+ENV=development uv run python -c "from src.config.settings import settings; print(settings.get_cors_origins())"
+ENV=production CORS_ORIGINS=https://example.com uv run python -c "from src.config.settings import settings; print(settings.get_cors_origins())"
 ```
 
 ### Browser Testing
