@@ -139,7 +139,7 @@ This project uses pre-commit hooks to ensure code quality before commits:
 - ✅ **File formatting** (trailing whitespace, end-of-file)
 - ✅ **Docker linting** with Hadolint
 
-**Setup (already done):**
+**Setup:**
 ```bash
 uv run pre-commit install
 ```
